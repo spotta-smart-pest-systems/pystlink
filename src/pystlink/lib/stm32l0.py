@@ -1,5 +1,5 @@
 import time
-import src.pystlink.lib.stlinkex
+import lib.stlinkex
 
 # Stm32 L0 and L1 programming
 class Flash():

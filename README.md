@@ -1,3 +1,19 @@
+#pystlink
+
+## Installing pystlink
+```
+pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git
+```
+
+## Example of using pystlink
+```python
+from pystlink import PyStlink
+
+pystlink = PyStlink()
+print(pystlink.ReadWord(0x08000000))
+```
+
+--------------
 # PYSTLINK
 
 Python tool for manipulating with STM32 MCUs using **ST-Link** in-system programmer and debugger.

@@ -1,5 +1,5 @@
-from src.pystlink import lib
-import src.pystlink.lib.stlinkex
+import lib
+import lib.stlinkex
 
 
 class Stm32():

@@ -1,17 +1,17 @@
 import time
 from textwrap import wrap
-from src.pystlink import lib
-import src.pystlink.lib.stlinkv2
-import src.pystlink.lib.stm32
-import src.pystlink.lib.stm32fp
-import src.pystlink.lib.stm32fs
-import src.pystlink.lib.stm32l0
-import src.pystlink.lib.stm32l4
-import src.pystlink.lib.stm32h7
-import src.pystlink.lib.stm32devices
-import src.pystlink.lib.stlinkex
-import src.pystlink.lib.dbg
-import src.pystlink.lib.srec
+import lib
+import lib.stlinkv2
+import lib.stm32
+import lib.stm32fp
+import lib.stm32fs
+import lib.stm32l0
+import lib.stm32l4
+import lib.stm32h7
+import lib.stm32devices
+import lib.stlinkex
+import lib.dbg
+import lib.srec
 
 
 

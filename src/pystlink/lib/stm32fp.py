@@ -1,5 +1,5 @@
 import time
-import src.pystlink.lib.stlinkex
+import lib.stlinkex
 
 
 class Flash():
