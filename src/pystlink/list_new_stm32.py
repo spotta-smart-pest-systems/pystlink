@@ -1,6 +1,5 @@
 import urllib.request
 import json
-import lib.stm32devices
 
 
 def fix_cpu_type(cpu_type):
@@ -65,7 +64,7 @@ for raw_json in raw_jsons:
 print("MCUs on ST.com is: %d" % len(mcus))
 
 supported_mcus = {}
-for devs in lib.stm32devices.DEVICES:
+for devs in src.pystlink.lib.stm32devices.DEVICES:
     for dev in devs['devices']:
         for d in dev['devices']:
             supported_mcus[d['type']] = d
