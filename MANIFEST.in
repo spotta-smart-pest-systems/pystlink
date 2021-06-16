@@ -1,1 +1,1 @@
-include src/pystlink/bin/hi.txt
+include *.txt
