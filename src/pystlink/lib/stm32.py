@@ -1,5 +1,5 @@
-import lib
-import lib.stlinkex
+from pystlink import lib
+from pystlink.lib import stlinkex
 
 
 class Stm32():
@@ -49,7 +49,7 @@ class Stm32():
         if reg in Stm32.REGISTERS:
             index = Stm32.REGISTERS.index(reg)
             return self._stlink.get_reg(index)
-        raise src.pystlink.lib.stlinkex.StlinkException('Wrong register name')
+        raise stlinkex.StlinkException('Wrong register name')
 
     def set_reg(self, reg, value):
         self._dbg.debug('Stm32.set_reg(%s, 0x%08x)' % (reg, value))
@@ -57,7 +57,7 @@ class Stm32():
         if reg in Stm32.REGISTERS:
             index = Stm32.REGISTERS.index(reg)
             return self._stlink.set_reg(index, value)
-        raise src.pystlink.lib.stlinkex.StlinkException('Wrong register name')
+        raise stlinkex.StlinkException('Wrong register name')
 
     def get_mem(self, addr, size):
         self._dbg.debug('Stm32.get_mem(0x%08x, %d)' % (addr, size))
@@ -122,7 +122,7 @@ class Stm32():
 
     def fill_mem(self, addr, size, pattern):
         if pattern >= 256:
-            raise src.pystlink.lib.stlinkex.StlinkException('Fill pattern can by 8 bit number')
+            raise stlinkex.StlinkException('Fill pattern can by 8 bit number')
         self._dbg.debug('Stm32.fill_mem(0x%08x, 0x%02d)' % (addr, pattern))
         if size == 0:
             return
@@ -207,11 +207,11 @@ class Stm32():
 
     def flash_erase_all(self, flash_size):
         self._dbg.debug('Stm32.flash_mass_erase()')
-        raise src.pystlink.lib.stlinkex.StlinkException('Erasing FLASH is not implemented for this MCU')
+        raise stlinkex.StlinkException('Erasing FLASH is not implemented for this MCU')
 
     def flash_write(self, addr, data, erase=False, verify=False, erase_sizes=None):
         self._dbg.debug('Stm32.flash_write(%s, [data:%dBytes], erase=%s, verify=%s, erase_sizes=%s)' % (('0x%08x' % addr) if addr is not None else 'None', len(data), erase, verify, erase_sizes))
-        raise src.pystlink.lib.stlinkex.StlinkException('Programing FLASH is not implemented for this MCU')
+        raise stlinkex.StlinkException('Programing FLASH is not implemented for this MCU')
 
     def flash_verify(self, addr, data):
         self._dbg.debug('Stm32.flash_verify(%s, [data:%dBytes])' % (('0x%08x' % addr) if addr is not None else 'None', len(data)))
@@ -222,13 +222,13 @@ class Stm32():
             block = data[:uneven]
             data = data[uneven:]
             if block != self._stlink.get_mem8(addr, uneven):
-                raise src.pystlink.lib.stlinkex.StlinkException('Verify error at non-aligned block address: 0x%08x' % addr)
+                raise stlinkex.StlinkException('Verify error at non-aligned block address: 0x%08x' % addr)
             addr += uneven
         while(data):
             block = data[:1024]
             data = data[1024:]
             if block != self._stlink.get_mem32(addr, len(block)):
-                raise src.pystlink.lib.stlinkex.StlinkException('Verify error at block address: 0x%08x' % addr)
+                raise stlinkex.StlinkException('Verify error at block address: 0x%08x' % addr)
             addr += len(block)
             self._dbg.bargraph_update(value=addr)
         if (len(data) & 1):
@@ -236,6 +236,6 @@ class Stm32():
             block = data[:remainder]
             block = block[remainder:]
             if block != self._stlink.get_mem8(addr, remainder):
-                raise src.pystlink.lib.stlinkex.StlinkException('Verify error at block address at non-aligned length: 0x%08x' % addr)
+                raise stlinkex.StlinkException('Verify error at block address at non-aligned length: 0x%08x' % addr)
             addr += remainder
         self._dbg.bargraph_done()

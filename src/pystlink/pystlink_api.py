@@ -1,17 +1,18 @@
 import time
 from textwrap import wrap
-import lib
-import lib.stlinkv2
-import lib.stm32
-import lib.stm32fp
-import lib.stm32fs
-import lib.stm32l0
-import lib.stm32l4
-import lib.stm32h7
-import lib.stm32devices
-import lib.stlinkex
-import lib.dbg
-import lib.srec
+from pystlink import lib
+from pystlink.lib import stlinkv2
+from pystlink.lib import stlinkusb
+from pystlink.lib import stm32
+from pystlink.lib import stm32fp
+from pystlink.lib import stm32fs
+from pystlink.lib import stm32l0
+from pystlink.lib import stm32l4
+from pystlink.lib import stm32h7
+from pystlink.lib import stm32devices
+from pystlink.lib import stlinkex
+from pystlink.lib import dbg
+from pystlink.lib import srec
 
 
 
@@ -23,7 +24,7 @@ class PyStlink():
         self._stlink = None
         self.driver = None
 
-        self._dbg = src.pystlink.lib.dbg.Dbg(verbosity)
+        self._dbg = dbg.Dbg(verbosity)
         self._serial = None
         self._index = 0
         self._hard = False
@@ -37,14 +38,14 @@ class PyStlink():
             self._core.core_halt()
         cpuid = self._stlink.get_debugreg32(PyStlink.CPUID_REG)
         if cpuid == 0:
-            raise src.pystlink.lib.stlinkex.StlinkException('Not connected to CPU')
+            raise stlinkex.StlinkException('Not connected to CPU')
         self._dbg.verbose("CPUID:  %08x" % cpuid)
         partno = 0xfff & (cpuid >> 4)
-        for mcu_core in src.pystlink.lib.stm32devices.DEVICES:
+        for mcu_core in stm32devices.DEVICES:
             if mcu_core['part_no'] == partno:
                 self._mcus_by_core = mcu_core
                 return
-        raise src.pystlink.lib.stlinkex.StlinkException('PART_NO: 0x%03x is not supported' % partno)
+        raise stlinkex.StlinkException('PART_NO: 0x%03x is not supported' % partno)
 
     def find_mcus_by_devid(self):
         # STM32H7 hack: this MCU has ID-CODE on different address than STM32F7
@@ -60,7 +61,7 @@ class PyStlink():
                 if mcu_devid['dev_id'] == devid:
                     self._mcus_by_devid = mcu_devid
                     return
-        raise src.pystlink.lib.stlinkex.StlinkException('DEV_ID: 0x%03x is not supported' % devid)
+        raise stlinkex.StlinkException('DEV_ID: 0x%03x is not supported' % devid)
 
     def find_mcus_by_flash_size(self):
         self._flash_size = self._stlink.get_debugreg16(self._mcus_by_devid['flash_size_reg'])
@@ -69,7 +70,7 @@ class PyStlink():
             if mcu['flash_size'] == self._flash_size:
                 self._mcus.append(mcu)
         if not self._mcus:
-            raise src.pystlink.lib.stlinkex.StlinkException('Connected CPU with DEV_ID: 0x%03x and FLASH size: %dKB is not supported. Check Protection' % (
+            raise stlinkex.StlinkException('Connected CPU with DEV_ID: 0x%03x and FLASH size: %dKB is not supported. Check Protection' % (
                 self._mcus_by_devid['dev_id'], self._flash_size
             ))
 
@@ -83,7 +84,7 @@ class PyStlink():
                 cpu_type[9] = 'x'
                 cpu_type = ''.join(cpu_type)
             return cpu_type
-        raise src.pystlink.lib.stlinkex.StlinkException('"%s" is not STM32 family' % cpu_type)
+        raise stlinkex.StlinkException('"%s" is not STM32 family' % cpu_type)
 
     def filter_detected_cpu(self, expected_cpus):
         cpus = []
@@ -94,7 +95,7 @@ class PyStlink():
                     cpus.append(detected_cpu)
                     break
         if not cpus:
-            raise src.pystlink.lib.stlinkex.StlinkException('Connected CPU is not %s but detected is %s %s' % (
+            raise stlinkex.StlinkException('Connected CPU is not %s but detected is %s %s' % (
                 ','.join(expected_cpus),
                 'one of' if len(self._mcus) > 1 else '',
                 ','.join([cpu['type'] for cpu in self._mcus]),
@@ -105,31 +106,31 @@ class PyStlink():
     def load_driver(self):
         flash_driver = self._mcus_by_devid['flash_driver']
         if flash_driver == 'STM32FP':
-            self.driver = src.pystlink.lib.stm32fp.Stm32FP(self._stlink, dbg=self._dbg)
+            self.driver = stm32fp.Stm32FP(self._stlink, dbg=self._dbg)
         elif flash_driver == 'STM32FPXL':
-            self.driver = src.pystlink.lib.stm32fp.Stm32FPXL(self._stlink, dbg=self._dbg)
+            self.driver = stm32fp.Stm32FPXL(self._stlink, dbg=self._dbg)
         elif flash_driver == 'STM32FS':
-            self.driver = src.pystlink.lib.stm32fs.Stm32FS(self._stlink, dbg=self._dbg)
+            self.driver = stm32fs.Stm32FS(self._stlink, dbg=self._dbg)
         elif flash_driver == 'STM32L0':
-            self.driver = src.pystlink.lib.stm32l0.Stm32L0(self._stlink, dbg=self._dbg)
+            self.driver = stm32l0.Stm32L0(self._stlink, dbg=self._dbg)
         elif flash_driver == 'STM32L4':
-            self.driver = src.pystlink.lib.stm32l4.Stm32L4(self._stlink, dbg=self._dbg)
+            self.driver = stm32l4.Stm32L4(self._stlink, dbg=self._dbg)
         elif flash_driver == 'STM32H7':
-            self.driver = src.pystlink.lib.stm32h7.Stm32H7(self._stlink, dbg=self._dbg)
+            self.driver = stm32h7.Stm32H7(self._stlink, dbg=self._dbg)
         else:
             self.driver = self._core
 
     def detect_cpu(self, expected_cpus, unmount=False):
-        self._connector = src.pystlink.lib.stlinkusb.StlinkUsbConnector(dbg=self._dbg, serial=self._serial, index = self._index)
+        self._connector = stlinkusb.StlinkUsbConnector(dbg=self._dbg, serial=self._serial, index = self._index)
         if unmount:
             self._connector.unmount_discovery()
-        self._stlink = src.pystlink.lib.stlinkv2.Stlink(self._connector, dbg=self._dbg)
+        self._stlink = stlinkv2.Stlink(self._connector, dbg=self._dbg)
         self._dbg.info("DEVICE: ST-Link/%s" % self._stlink.ver_str)
         self._dbg.info("SUPPLY: %.2fV" % self._stlink.target_voltage)
         self._dbg.verbose("COREID: %08x" % self._stlink.coreid)
         if self._stlink.coreid == 0:
-            raise src.pystlink.lib.stlinkex.StlinkException('Not connected to CPU')
-        self._core = src.pystlink.lib.stm32.Stm32(self._stlink, dbg=self._dbg)
+            raise stlinkex.StlinkException('Not connected to CPU')
+        self._core = stm32.Stm32(self._stlink, dbg=self._dbg)
         self.find_mcus_by_core()
         self._dbg.info("CORE:   %s" % self._mcus_by_core['core'])
         self.find_mcus_by_devid()
@@ -176,7 +177,6 @@ class PyStlink():
             hex_bytes.reverse()
             hex_bytes = list(map(lambda x: int(x, 16), hex_bytes))
             data.extend(hex_bytes)
-        print(data)
         self.driver.set_mem(address, data)
 
 
@@ -221,7 +221,7 @@ class PyStlink():
 
     def read_file(self, filename):
         if filename.endswith('.srec'):
-            srec = src.pystlink.lib.srec.Srec()
+            srec = srec.Srec()
             srec.encode_file(filename)
             size = sum([len(i[1]) for i in srec.buffers])
             self._dbg.info("Loaded %d Bytes from %s file" % (size, filename))
@@ -233,7 +233,7 @@ class PyStlink():
 
     def program_flash(self, firmware, erase=True, verify=True):
         mem = self.read_file(str(firmware))
-        start_addr = src.pystlink.lib.stm32.Stm32.FLASH_START
+        start_addr = stm32.Stm32.FLASH_START
         for addr, data in mem:
             if addr is None:
                 addr = start_addr

@@ -1,5 +1,6 @@
 import time
-import lib.stlinkex
+from pystlink.lib import stm32
+from pystlink.lib import stlinkex
 
 # Stm32H7 programming
 class Flash():
@@ -90,12 +91,12 @@ class Flash():
             self._stlink.set_debugreg32(Flash.FLASH_KEYR_REGS[bank], 0xcdef89ab)
             cr = self._stlink.get_debugreg32(Flash.FLASH_CR_REGS[bank])
         else :
-            raise src.pystlink.lib.stlinkex.StlinkException(
+            raise stlinkex.StlinkException(
                 'Unexpected unlock behaviour bank %d! FLASH_CR 0x%08x'
                                                % (bank, cr))
         # check if programing was unlocked
         if cr & Flash.FLASH_CR_LOCK:
-            raise src.pystlink.lib.stlinkex.StlinkException(
+            raise stlinkex.StlinkException(
                 'Error unlocking bank %d, FLASH_CR: 0x%08x. Reset!'
                                                % (bank, cr))
 
@@ -153,8 +154,8 @@ class Flash():
             (self._sector_size, addr, size))
         self._dbg.bargraph_start('Erasing FLASH', value_min=addr,
                                  value_max=addr + size)
-        sector     = addr - src.pystlink.lib.stm32.Stm32.FLASH_START
-        end_sector = addr + size - src.pystlink.lib.stm32.Stm32.FLASH_START
+        sector     = addr - stm32.Stm32.FLASH_START
+        end_sector = addr + size - stm32.Stm32.FLASH_START
         sector     //= self._sector_size
         end_sector //= self._sector_size
         if sector == 0 and end_sector >= 8:
@@ -192,13 +193,13 @@ class Flash():
                     self._dbg.bargraph_done()
                 return
             time.sleep(wait_time / 20)
-        raise src.pystlink.lib.stlinkex.StlinkException('Operation timeout')
+        raise stlinkex.StlinkException('Operation timeout')
 
     def end_of_operation(self, status):
         if status & Flash.FLASH_SR_ERROR_MASK:
-            raise src.pystlink.lib.stlinkex.StlinkException('Error writing FLASH with status (FLASH_SR) %08x' % status)
+            raise stlinkex.StlinkException('Error writing FLASH with status (FLASH_SR) %08x' % status)
 
-class Stm32H7(src.pystlink.lib.stm32.Stm32):
+class Stm32H7(stm32.Stm32):
     def flash_erase_all(self, flash_size):
         self._dbg.debug('Stm32H7.flash_erase_all()')
         flash = Flash(self, self._stlink, self._dbg)
@@ -213,7 +214,7 @@ class Stm32H7(src.pystlink.lib.stm32.Stm32):
             'Stm32h7.flash_write(%s, [data:%dBytes], erase=%s)' %
             (addr, len(data), erase))
         if addr % 8:
-            raise src.pystlink.lib.stlinkex.StlinkException(
+            raise stlinkex.StlinkException(
                 'Start address is not aligned to word')
         # pad data
         if len(data) % 32:
@@ -234,14 +235,14 @@ class Stm32H7(src.pystlink.lib.stm32.Stm32):
             self._stlink.set_debugreg32(Flash.FLASH_CR_REGS[0], cr)
             cr =  self._stlink.get_debugreg32(Flash.FLASH_CR_REGS[0])
             if not cr & Flash.FLASH_CR_PG:
-                raise src.pystlink.lib.stlinkex.StlinkException(
+                raise stlinkex.StlinkException(
                     'Bank 0 FLASH_CR not ready for programming: %08x\n' % cr)
         if addr + len(data) >= 0x08100000:
             flash.unlock(1)
             self._stlink.set_debugreg32(Flash.FLASH_CR_REGS[1], cr)
             cr =  self._stlink.get_debugreg32(Flash.FLASH_CR_REGS[1])
             if not cr & Flash.FLASH_CR_PG:
-                raise src.pystlink.lib.stlinkex.StlinkException(
+                raise stlinkex.StlinkException(
                     'Bank 1 FLASH_CR not ready for programming: %08x\n' % cr)
         datablock = data
         data_addr = addr
@@ -258,9 +259,9 @@ class Stm32H7(src.pystlink.lib.stm32.Stm32):
         self._dbg.bargraph_done()
         status = self._stlink.get_debugreg32(Flash.FLASH_SR_REGS[0])
         if status & Flash.FLASH_SR_ERROR_MASK:
-            raise src.pystlink.lib.stlinkex.StlinkException(
+            raise stlinkex.StlinkException(
                 'Bank 0, Error writing FLASH with status: %08x\n' % status)
         status = self._stlink.get_debugreg32(Flash.FLASH_SR_REGS[1])
         if status & Flash.FLASH_SR_ERROR_MASK:
-            raise src.pystlink.lib.stlinkex.StlinkException(
+            raise stlinkex.StlinkException(
                 'Bank 1, Error writing FLASH with status: %08x\n' % status)

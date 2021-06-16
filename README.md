@@ -1,9 +1,9 @@
 #pystlink
 
 ## Installing pystlink
-```
-pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git
-```
+1. ```pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git```
+2. For Windows users: Find the install.bat file and run it in admin mode. This will copy the libusb-1.0.dll (usb driver)
+   into the C:\WINDOWS\system32 folder.
 
 ## Example of using pystlink
 ```python
