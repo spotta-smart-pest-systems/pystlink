@@ -1,2 +1,1 @@
-include src/pystlink/bin/install.bat
-include src/pystlink/bin/libusb-1.0.dll
+include src/pystlink/bin/hi.txt
