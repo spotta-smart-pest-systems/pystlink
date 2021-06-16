@@ -1,1 +1,2 @@
-recursive-include src/pystlink/bin *
+include src/pystlink/bin/install.bat
+include src/pystlink/bin/libusb-1.0.dll
