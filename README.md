@@ -1,9 +1,12 @@
-#pystlink
+# pystlink
 
 ## Installing pystlink
 1. ```pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git```
 2. For Windows users: Find the install.bat file and run it in admin mode. This will copy the libusb-1.0.dll (usb driver)
-   into the C:\WINDOWS\system32 folder.
+   into the C:\WINDOWS\system32 folder. To find the install.bat file first run ```python -m pip show pystlink```
+   this shows the python site packages folder, for example... 
+   Location: c:\users\jordan\appdata\local\programs\python\python39\lib\site-packages . Inside the site-packages folder
+   navigate to pystlink\bin. Right-hand click and select 'Run as administrator' 
 
 ## Example of using pystlink
 ```python
@@ -12,6 +15,39 @@ from pystlink import PyStlink
 pystlink = PyStlink()
 print(pystlink.ReadWord(0x08000000))
 ```
+
+## Making changes to pystlink
+Step 1: Checkout this repository:
+```shell
+git clone git@github.com:spotta-smart-pest-systems/pystlink.git
+```
+Step 2: Make changes to the source files<br> 
+
+Step 3: In setup.cfg increment the version number:
+```python
+[metadata]
+name = pystlink
+version = X.X.X     # <--- change this
+...
+```
+Step 4: Make sure you have the latest version of PyPA’s build installed:
+```shell
+python -m pip install --upgrade build
+```
+Step 5: Build the wheel:
+```shell
+python -m build
+```
+Step 6: Reinstall the package:
+```shell
+python -m pip install dist/pystlink-X.X.X-py3-none-any.whl --force-reinstall
+```
+Step 7: Run any local python scripts that use the pystlink package to check everything works as expected<br>
+```shell
+python your_own_script_that_uses_stlink.py
+```
+Step 8: git commit and git push code back to this repo
+
 
 --------------
 # PYSTLINK
