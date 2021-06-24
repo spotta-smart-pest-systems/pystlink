@@ -2,8 +2,8 @@
 
 ## Installing pystlink
 1. ```pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git```
-2. For Windows users: Find the install.bat file and run it in admin mode. This will copy the libusb-1.0.dll (usb driver)
-   into the C:\WINDOWS\system32 folder. To find the install.bat file first run ```python -m pip show pystlink```
+2. For Windows users: Find the install.bat file and run it in admin mode. This bat file will copy the libusb-1.0.dll
+   (usb driver) into the C:\WINDOWS\system32 folder. To find the install.bat file first run ```python -m pip show pystlink```
    this shows the python site packages folder, for example... 
    Location: c:\users\jordan\appdata\local\programs\python\python39\lib\site-packages . Inside the site-packages folder
    navigate to pystlink\bin. Right-hand click and select 'Run as administrator' 
@@ -21,32 +21,37 @@ Step 1: Checkout this repository:
 ```shell
 git clone git@github.com:spotta-smart-pest-systems/pystlink.git
 ```
-Step 2: Make changes to the source files<br> 
 
-Step 3: In setup.cfg increment the version number:
-```python
+Step 2: Ensure you have the latest version of pip (This is important! Step 3 might not work otherwise)
+```shell
+python -m pip install --upgrade pip
+```
+
+Step 3: Install the local version of the pystlink package on to your python interpreter. Note: using the --editable
+flag causes any changes made to the python package code to be immediately implemented thus removing the need to 
+continuously reinstall the python package everytime a code edit is to be tested. 
+```shell
+pip install --editable C:/Users/XXXXXX/XXXXXX/XXXXXX/pystlink/
+```
+
+Step 4: Make changes to the python package source files<br>
+
+Step 5: Run any local python scripts that use the pystlink package to check everything works as expected<br>
+```shell
+python your_own_script_that_uses_stlink.py
+```
+
+Step 6: Repeat steps 4 and 5 until python package works as desired
+
+Step 7: In setup.cfg increment the version number:
+```ini
 [metadata]
 name = pystlink
 version = X.X.X     # <--- change this
 ...
 ```
-Step 4: Make sure you have the latest version of PyPA’s build installed:
-```shell
-python -m pip install --upgrade build
-```
-Step 5: Build the wheel:
-```shell
-python -m build
-```
-Step 6: Reinstall the package:
-```shell
-python -m pip install dist/pystlink-X.X.X-py3-none-any.whl --force-reinstall
-```
-Step 7: Run any local python scripts that use the pystlink package to check everything works as expected<br>
-```shell
-python your_own_script_that_uses_stlink.py
-```
-Step 8: git commit and git push code back to this repo
+
+Step 8: ```git commit -m "XXXXX" ``` and ```git push``` to push changes back to online repo
 
 
 --------------
