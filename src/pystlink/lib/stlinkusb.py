@@ -1,6 +1,6 @@
 import usb.core
 import usb.util
-import stlinkex
+from pystlink.lib import stlinkex
 import re
 
 

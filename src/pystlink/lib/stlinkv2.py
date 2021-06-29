@@ -1,4 +1,4 @@
-import stlinkex
+from pystlink.lib import stlinkex
 
 class Stlink():
     STLINK_GET_VERSION = 0xf1
