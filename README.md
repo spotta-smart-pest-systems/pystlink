@@ -6,7 +6,13 @@
    (usb driver) into the C:\WINDOWS\system32 folder. To find the install.bat file first run ```python -m pip show pystlink```
    this shows the python site packages folder, for example... 
    Location: c:\users\jordan\appdata\local\programs\python\python39\lib\site-packages . Inside the site-packages folder
-   navigate to pystlink\bin. Right-hand click and select 'Run as administrator' 
+   navigate to pystlink\bin. Right-hand click and select 'Run as administrator'
+3. For Linux users: Allow read and write access to the usb STLINK devices by running the commands below...
+```shell
+sudo echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0666"	# STLINK-V2' > /etc/udev/rules.d/90-my-extra-usb.rules
+sudo echo 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666"	# STLINK-V3' >> /etc/udev/rules.d/90-my-extra-usb.rules
+sudo udevadm control --reload-rules
+```
 
 ## Example of using pystlink
 ```python
