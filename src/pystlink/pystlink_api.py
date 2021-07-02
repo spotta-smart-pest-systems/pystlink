@@ -47,11 +47,7 @@ class PyStlink():
             pass
 
     def initialize_comms(self):
-        self.stlink = stlinkv2.Stlink(self._connector, dbg=self._dbg)
-        a2 = time.perf_counter()
-        self._dbg.info("DEVICE: ST-Link/%s" % self.stlink.ver_str)
-        self._dbg.info("SUPPLY: %.2fV" % self.stlink.target_voltage)
-        self._dbg.verbose("COREID: %08x" % self.stlink.coreid)
+        self.initialize_stlink_comms()
         if self.stlink.coreid == 0:
             raise stlinkex.StlinkException('STLink could not connect to microcontroller')
         self._core = stm32.Stm32(self.stlink, dbg=self._dbg)
@@ -63,6 +59,16 @@ class PyStlink():
         self._dbg.info("FLASH:  %dKB" % self._flash_size)
         self.load_driver()
         self.comms_initialized = True
+
+    def initialize_stlink_comms(self):
+        self.stlink = stlinkv2.Stlink(self._connector, dbg=self._dbg)
+        self._dbg.info("DEVICE: ST-Link/%s" % self.stlink.ver_str)
+        self._dbg.info("SUPPLY: %.2fV" % self.stlink.target_voltage)
+        self._dbg.verbose("COREID: %08x" % self.stlink.coreid)
+
+    def get_target_voltage(self):
+        self.initialize_stlink_comms()
+        return self.stlink.target_voltage
 
     def find_mcus_by_core(self):
         if (self._hard):
