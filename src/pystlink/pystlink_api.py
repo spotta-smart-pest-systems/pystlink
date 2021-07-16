@@ -203,7 +203,7 @@ class PyStlink():
         if len(hex_data) % 8 != 0:
             raise Exception("OTP data is an invalid length")
         num_words = int(len(hex_data) / 8)
-        blank_value = "FFFFFFFF" * num_words
+        blank_value = "ffffffff" * num_words
 
         # Read OTP before attempting to write
         words = self.ReadWords(address, num_words)

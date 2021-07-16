@@ -1,20 +1,22 @@
 # pystlink
 
 ## Installing pystlink
-1. ```pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git```
-2. For Windows users: Find the install.bat file and run it in admin mode. This bat file will copy the libusb-1.0.dll
-   (usb driver) into the C:\WINDOWS\system32 folder. To find the install.bat file first run ```python -m pip show pystlink```
-   this shows the python site packages folder, for example... 
-   Location: c:\users\jordan\appdata\local\programs\python\python39\lib\site-packages . Inside the site-packages folder
-   navigate to pystlink\bin. Right-hand click and select 'Run as administrator'
-3. For Linux users: Allow read and write access to the usb STLINK devices by running the commands below...
-```
-sudo sh -c 'printf 'SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0666"	\
-# STLINK-V2' > /etc/udev/rules.d/90-my-extra-usb.rules"
-sudo sh -c "printf "SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666"	\
-# STLINK-V3' >> /etc/udev/rules.d/90-my-extra-usb.rules"
-sudo udevadm control --reload-rules
-```
+1.  ```pip install git+ssh://git@github.com/spotta-smart-pest-systems/pystlink.git```
+2.  For Windows users: Find the install.bat file and run it in admin mode. This bat file will copy the libusb-1.0.dll
+    (usb driver) into the C:\WINDOWS\system32 folder. To find the install.bat file first run ```python -m pip show pystlink```
+    this shows the python site packages folder, for example... 
+    Location: c:\users\jordan\appdata\local\programs\python\python39\lib\site-packages . Inside the site-packages folder
+    navigate to pystlink\bin. Right-hand click and select 'Run as administrator'
+3.  For Linux users: Allow read and write access to the usb STLINK devices by creating a new rules file using the
+    command... ```sudo nano /etc/udev/rules.d/90-my-extra-usb.rules``` and then fill the file with...
+    ```shell
+    # STLINK-V2
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="3748", MODE="0666"
+    # STLINK-V3
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="374f", MODE="0666"
+    ```
+    save the file and exit nano. Now run the command ```udevadm control --reload``` to reload the usb rules. Now unplug
+    and plug back in the STLINK usb device.
 
 ## Example of using pystlink
 ```python
