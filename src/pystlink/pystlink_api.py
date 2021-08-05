@@ -4,11 +4,11 @@ def ReadWord(self, address, initialize_comms=True):
 setting initialize_comms=False will skip the comms initialization step and save ~0.2 seconds. However one intialization
 needs to be done to get things running. Therefore the fastest way to perform 5 register reads is...
 
-pystlink.ReadWord(0x08000000, initialize_comms=True)
-pystlink.ReadWord(0x08000000, initialize_comms=False)
-pystlink.ReadWord(0x08000000, initialize_comms=False)
-pystlink.ReadWord(0x08000000, initialize_comms=False)
-pystlink.ReadWord(0x08000000, initialize_comms=False)
+pystlink.read_word(0x08000000, initialize_comms=True)
+pystlink.read_word(0x08000000, initialize_comms=False)
+pystlink.read_word(0x08000000, initialize_comms=False)
+pystlink.read_word(0x08000000, initialize_comms=False)
+pystlink.read_word(0x08000000, initialize_comms=False)
 """
 
 import time
@@ -158,13 +158,13 @@ class PyStlink():
         else:
             self.driver = self._core
 
-    def ReadWord(self, address, initialize_comms=True):
+    def read_word(self, address, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
         data = self.driver.get_mem(address, 4)
         return f"{data[3]:02x}{data[2]:02x}{data[1]:02x}{data[0]:02x}"
 
-    def ReadWords(self, address, num_words, initialize_comms=True):
+    def read_words(self, address, num_words, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
         num_bytes = num_words*4
@@ -176,7 +176,7 @@ class PyStlink():
             words[i] = f"{data[3+(i*4)]:02x}{data[2+(i*4)]:02x}{data[1+(i*4)]:02x}{data[0+(i*4)]:02x}"
         return words
 
-    def WriteWord(self, address, value, initialize_comms=True):
+    def write_word(self, address, value, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
         print("Warning: WriteWord() isn't as simple to use as the -w32 function from ST-LINK_CLI.exe")
@@ -185,7 +185,7 @@ class PyStlink():
             raise Exception("Error with WriteWord(): value is invalid")
         self.WriteWords(address, value)
 
-    def WriteWords(self, address, values, initialize_comms=True):
+    def write_words(self, address, values, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
         if type(values) != str:
@@ -201,7 +201,7 @@ class PyStlink():
             data.extend(hex_bytes)
         self.driver.set_mem(address, data)
 
-    def ProgramOTP(self, address, hex_data, initialize_comms=True):
+    def program_otp(self, address, hex_data, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
         if len(hex_data) == 0:
@@ -241,6 +241,14 @@ class PyStlink():
                 print("Unable to write to OTP as OTP isn't blank")
                 return 1
         return 0
+
+    def write_word_to_flash(self, address, value, initialize_comms=True):
+        if initialize_comms:
+            self.initialize_comms()
+        data_bytes = wrap(value, 2)
+        data_bytes.reverse()
+        data_bytes = list(map(lambda x: int(x, 16), data_bytes))
+        self.driver.flash_write(address, data_bytes, erase=True, erase_sizes=self._mcus_by_devid['erase_sizes'])
 
     def program_flash(self, firmware, erase=True, verify=True, initialize_comms=True):
         if initialize_comms:
