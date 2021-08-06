@@ -1,6 +1,6 @@
 """
 Note: When using this api many of the commands come with an option to skip the initilization of the comms e.g. ...
-def ReadWord(self, address, initialize_comms=True):
+def read_word(self, address, initialize_comms=True):
 setting initialize_comms=False will skip the comms initialization step and save ~0.2 seconds. However one intialization
 needs to be done to get things running. Therefore the fastest way to perform 5 register reads is...
 
@@ -179,19 +179,19 @@ class PyStlink():
     def write_word(self, address, value, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
-        print("Warning: WriteWord() isn't as simple to use as the -w32 function from ST-LINK_CLI.exe")
+        print("Warning: write_word() isn't as simple to use as the -w32 function from ST-LINK_CLI.exe")
         print("         The memory location being written to may need to be unlocked\n")
         if len(value) != 8:
-            raise Exception("Error with WriteWord(): value is invalid")
-        self.WriteWords(address, value)
+            raise Exception("Error with write_word(): value is invalid")
+        self.write_words(address, value)
 
     def write_words(self, address, values, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
         if type(values) != str:
-            raise Exception("Error with WriteWords(): values must be a string")
+            raise Exception("Error with write_words(): values must be a string")
         if len(values) % 8 != 0:
-            raise Exception("Error with WriteWords(): values is invalid")
+            raise Exception("Error with write_words(): values is invalid")
         data = []
         words = wrap(values, 8)
         for word in words:
@@ -211,7 +211,7 @@ class PyStlink():
         num_words = int(len(hex_data) / 8)
 
         # Read OTP before attempting to write
-        words = self.ReadWords(address, num_words)
+        words = self.read_words(address, num_words)
         hex_data_read = "".join(words)
 
         blank_value = "ffffffff" * num_words
@@ -222,13 +222,13 @@ class PyStlink():
                 self.driver.flash.enable_flash_programming()
 
                 # Write to OTP
-                self.WriteWords(address, hex_data)
+                self.write_words(address, hex_data)
 
                 # Lock Flash
                 self.driver.flash.disable_flash_programming()
 
                 # Check what was witten to the OTP
-                words = self.ReadWords(address, num_words)
+                words = self.read_words(address, num_words)
                 hex_data_read = "".join(words)
                 if hex_data_read != hex_data:
                     if hex_data_read == blank_value:
@@ -283,4 +283,4 @@ class PyStlink():
 if __name__ == "__main__":
     pystlink = PyStlink(verbosity=2)
     input("press enter to continue")
-    print(pystlink.ReadWord(0x08000000))
+    print(pystlink.read_word(0x08000000))
