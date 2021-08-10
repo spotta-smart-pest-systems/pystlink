@@ -207,7 +207,7 @@ class PyStlink():
         hex_data = hex_data.lower()
         if len(hex_data) == 0:
             raise Exception("OTP data can't be zero in length")
-        if len(hex_data) % 8 != 0:
+        if len(hex_data) % 16 != 0:
             raise Exception("OTP data is an invalid length")
         num_words = int(len(hex_data) / 8)
 
