@@ -204,6 +204,7 @@ class PyStlink():
     def program_otp(self, address, hex_data, initialize_comms=True):
         if initialize_comms:
             self.initialize_comms()
+        hex_data = hex_data.lower()
         if len(hex_data) == 0:
             raise Exception("OTP data can't be zero in length")
         if len(hex_data) % 8 != 0:
@@ -211,7 +212,7 @@ class PyStlink():
         num_words = int(len(hex_data) / 8)
 
         # Read OTP before attempting to write
-        words = self.read_words(address, num_words)
+        words = self.read_words(address, num_words, initialize_comms=False)
         hex_data_read = "".join(words)
 
         blank_value = "ffffffff" * num_words
@@ -222,13 +223,13 @@ class PyStlink():
                 self.driver.flash.enable_flash_programming()
 
                 # Write to OTP
-                self.write_words(address, hex_data)
+                self.write_words(address, hex_data, initialize_comms=False)
 
                 # Lock Flash
                 self.driver.flash.disable_flash_programming()
 
                 # Check what was witten to the OTP
-                words = self.read_words(address, num_words)
+                words = self.read_words(address, num_words, initialize_comms=False)
                 hex_data_read = "".join(words)
                 if hex_data_read != hex_data:
                     if hex_data_read == blank_value:
