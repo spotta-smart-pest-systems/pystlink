@@ -268,6 +268,10 @@ class PyStlink():
                 self.driver.flash_verify(addr, data)
         self.driver.core_run()
 
+    def flash_erase_all(self):
+        flash_size = self.stlink.get_debugreg16(self._mcus_by_devid['flash_size_reg'])
+        self.driver.flash_erase_all(flash_size)
+
     def _read_file(self, filename):
         if filename.endswith('.srec'):
             srec = Srec()
